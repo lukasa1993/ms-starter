@@ -7,3 +7,5 @@ s3_secret
 db/data
 **.env**
 storage/minio
+!example.node.dev.env
+!example.dev.db.env

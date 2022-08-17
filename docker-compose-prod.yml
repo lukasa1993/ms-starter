@@ -1,7 +1,6 @@
 version: "3.9"
 services:
   kong:
-    container_name: kong
     image: kong:latest
     restart: always
     environment:
@@ -10,26 +9,38 @@ services:
       - KONG_PROXY_ERROR_LOG=/dev/stderr
       - KONG_ADMIN_ERROR_LOG=/dev/stderr
       - KONG_PG_PASSWORD_FILE=/run/secrets/POSTGRES_PASSWORD_FILE
+      - KONG_LUA_SSL_TRUSTED_CERTIFICATE=/etc/ssl/certs/ca-certificates.crt
+      - KONG_DNS_STALE_TTL=120
+      - KONG_DNS_VALID_TTL=30
+      - KONG_DNS_ORDER=A,CNAME
+      - KONG_DNS_NOT_FOUND_TTL=1
+      - KONG_DNS_NO_SYNC=on
     secrets:
       - POSTGRES_PASSWORD_FILE
     env_file:
-      - dev-db.env
+      - db.env
     ports:
       - "80:8000"
       - "443:8443"
-      - "127.0.0.1:8001:8001"
     working_dir: /tmp/run
     healthcheck:
       test: [ "CMD", "wget", "-qO-", "http://localhost:8001/status" ]
       interval: 1m30s
       timeout: 10s
       retries: 3
+    dns:
+      - 1.1.1.1
+      - 9.9.9.9
+    deploy:
+      update_config:
+        order: start-first
+      restart_policy:
+        condition: any
     networks:
       - sample-ms
     command: kong start
 
   kong_migrations:
-    container_name: kong_bootstrap
     image: kong:latest
     command: kong migrations bootstrap
     environment:
@@ -37,16 +48,17 @@ services:
     secrets:
       - POSTGRES_PASSWORD_FILE
     env_file:
-      - dev-db.env
+      - db.env
     networks:
       - sample-ms
     restart: on-failure
     deploy:
+      update_config:
+        order: start-first
       restart_policy:
         condition: on-failure
 
   kong_migrations_up:
-    container_name: kong_migrations
     image: kong:latest
     command: kong migrations up && kong migrations finish
     environment:
@@ -54,40 +66,19 @@ services:
     secrets:
       - POSTGRES_PASSWORD_FILE
     env_file:
-      - dev-db.env
+      - db.env
     networks:
       - sample-ms
     restart: on-failure
     deploy:
+      update_config:
+        order: start-first
       restart_policy:
         condition: on-failure
 
-  sample_db:
-    container_name: sample_db
-    user: postgres
-    image: postgres:12-alpine
-    restart: always
-    ports:
-      - "5432:5432"
-    healthcheck:
-      test: [ "CMD", "pg_isready" ]
-      timeout: 20s
-      retries: 10
-    volumes:
-      - ./db:/docker-entrypoint-initdb.d
-      - ./db/data:/var/lib/postgresql/data
-    env_file:
-      - dev-db.env
-    environment:
-      - POSTGRES_PASSWORD_FILE=/run/secrets/POSTGRES_PASSWORD_FILE
-    secrets:
-      - POSTGRES_PASSWORD_FILE
-    networks:
-      - sample-ms
 
   db-migrate:
-    container_name: db_migrate
-    image: node:lts
+    image: ghcr.io/lukasa1993/sample-db-migrations:latest
     restart: on-failure
     working_dir: /srv
     environment:
@@ -96,41 +87,40 @@ services:
     secrets:
       - POSTGRES_PASSWORD_FILE
     env_file:
-      - dev-db.env
-    volumes:
-      - /srv/node_modules
-      - ../sample-db-migrations:/srv
+      - dev.env
     networks:
       - sample-ms
     deploy:
+      update_config:
+        order: start-first
       restart_policy:
         condition: on-failure
     command: sh -c "export POSTGRES_PASSWORD=$$(cat /run/secrets/POSTGRES_PASSWORD_FILE) && npm install -g npm && npm install --no-package-lock --only=production --legacy-peer-deps --no-fund && node node_modules/db-migrate/bin/db-migrate up"
 
   ms_sample_auth:
-    image: ghcr.io/lukasa1993/ld_node:latest
-    container_name: ms_sample_auth
+    image: ghcr.io/lukasa1993/ms-sample-auth:latest
     restart: always
     secrets:
       - POSTGRES_PASSWORD_FILE
     env_file:
       - ./node.env
-      - ./dev-db.env
+      - ./dev.env
     healthcheck:
       test: [ "CMD", "wget", "-qO-", "http://localhost:7702/health" ]
       interval: 1m30s
       timeout: 10s
       retries: 3
-    volumes:
-      - /opt/app/node_modules
-      - ../ms-sample-auth:/opt/app
     working_dir: /opt/app
+    deploy:
+      update_config:
+        order: start-first
+      restart_policy:
+        condition: any
     networks:
       - sample-ms
 
   ms_sample_file:
-    image: ghcr.io/lukasa1993/ld_node:latest
-    container_name: ms_sample_file
+    image: ghcr.io/lukasa1993/ms-sample-file:latest
     restart: always
     env_file:
       - ./node.env
@@ -142,16 +132,17 @@ services:
     secrets:
       - S3_KEY
       - S3_SECRET
-    volumes:
-      - /opt/app/node_modules
-      - ../ms-sample-file:/opt/app
     working_dir: /opt/app
+    deploy:
+      update_config:
+        order: start-first
+      restart_policy:
+        condition: any
     networks:
       - sample-ms
 
   ms_sample_web_app:
-    image: ghcr.io/lukasa1993/ld_node:latest
-    container_name: ms_sample_web_app
+    image: ghcr.io/lukasa1993/ms-sample-web-app:latest
     restart: always
     env_file:
       - ./node.env
@@ -160,30 +151,14 @@ services:
       interval: 1m30s
       timeout: 10s
       retries: 3
-    volumes:
-      - /opt/app/node_modules
-      - ../ms-sample-web-app:/opt/app
     working_dir: /opt/app
+    deploy:
+      update_config:
+        order: start-first
+      restart_policy:
+        condition: any
     networks:
       - sample-ms
-
-  sample_s3:
-    container_name: sample_s3
-    image: minio/minio
-    ports:
-      - "9000:9000"
-      - "127.0.0.1:40199:40199"
-    volumes:
-      - ./storage/minio:/data
-    networks:
-      - sample-ms
-    secrets:
-      - S3_KEY
-      - S3_SECRET
-    environment:
-      MINIO_ROOT_USER_FILE: S3_KEY
-      MINIO_ROOT_PASSWORD_FILE: S3_SECRET
-    command: server --address 0.0.0.0:9000 --console-address 0.0.0.0:40199 /data
 
 networks:
   sample-ms:

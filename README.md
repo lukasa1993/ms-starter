@@ -1,0 +1,2 @@
+# ms-starter
+ microservices starter

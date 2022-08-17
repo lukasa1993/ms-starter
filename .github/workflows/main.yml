@@ -1,0 +1,31 @@
+name: trigger server update
+
+on:
+  repository_dispatch:
+    types:
+      - docker-rebuild
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    concurrency: sample-deploy-${{ github.event.client_payload.ms }}
+    steps:
+      - name: main-server-deploy
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.MAIN_HOST }}
+          username: ${{ secrets.MAIN_USERNAME }}
+          passphrase: ${{ secrets.MAIN_PASSPHRASE }}
+          key: ${{ secrets.MAIN_PRIVATE_KEY }}
+          script: |
+            cd ms-starter
+            git pull https://${{ github.actor }}:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git
+            echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
+            repo="${{ github.event.client_payload.repo }}"
+            image=ghcr.io/${repo,,}:latest
+            docker pull ${image}
+            docker service update --update-order start-first ${{ github.event.client_payload.ms }} --image=${image} --with-registry-auth --detach
+            docker logout ghcr.io
+      - name: Print commit Triggerer Repository
+        run: echo ${{ github.event.client_payload.repo }}

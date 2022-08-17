@@ -1,0 +1,150 @@
+version: "3.9"
+services:
+  kong:
+    container_name: kong
+    image: kong:latest
+    restart: always
+    environment:
+      - KONG_PROXY_ACCESS_LOG=/dev/stdout
+      - KONG_ADMIN_ACCESS_LOG=/dev/stdout
+      - KONG_PROXY_ERROR_LOG=/dev/stderr
+      - KONG_ADMIN_ERROR_LOG=/dev/stderr
+      - KONG_PG_PASSWORD_FILE=/run/secrets/POSTGRES_PASSWORD_FILE
+    secrets:
+      - POSTGRES_PASSWORD_FILE
+    env_file:
+      - dev-db.env
+    ports:
+      - "80:8000"
+      - "443:8443"
+      - "127.0.0.1:8001:8001"
+    working_dir: /tmp/run
+    healthcheck:
+      test: [ "CMD", "wget", "-qO-", "http://localhost:8001/status" ]
+      interval: 1m30s
+      timeout: 10s
+      retries: 3
+    networks:
+      - sample-ms
+    command: kong start
+
+  kong-migrations:
+    container_name: kong-bootstrap
+    image: kong:latest
+    command: kong migrations bootstrap
+    environment:
+      - KONG_PG_PASSWORD_FILE=/run/secrets/POSTGRES_PASSWORD_FILE
+    secrets:
+      - POSTGRES_PASSWORD_FILE
+    env_file:
+      - dev-db.env
+    networks:
+      - sample-ms
+    restart: on-failure
+    deploy:
+      restart_policy:
+        condition: on-failure
+
+  kong-migrations-up:
+    container_name: kong-migrations
+    image: kong:latest
+    command: kong migrations up && kong migrations finish
+    environment:
+      - KONG_PG_PASSWORD_FILE=/run/secrets/POSTGRES_PASSWORD_FILE
+    secrets:
+      - POSTGRES_PASSWORD_FILE
+    env_file:
+      - dev-db.env
+    networks:
+      - sample-ms
+    restart: on-failure
+    deploy:
+      restart_policy:
+        condition: on-failure
+
+  kong-admin:
+    container_name: kong-admin
+    image: mtkvnela/kong-admin-ui:latest
+    restart: always
+    ports:
+      - "8800:80"
+    networks:
+      - sample-ms
+
+  sample-db:
+    container_name: sample-db
+    user: postgres
+    image: postgres:alpine
+    restart: always
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: [ "CMD", "pg_isready" ]
+      timeout: 20s
+      retries: 10
+    volumes:
+      - ./db:/docker-entrypoint-initdb.d
+      - ./db/data:/var/lib/postgresql/data
+    env_file:
+      - dev-db.env
+    environment:
+      - POSTGRES_PASSWORD_FILE=/run/secrets/POSTGRES_PASSWORD_FILE
+      - POSTGRES_USER=sampledev
+    secrets:
+      - POSTGRES_PASSWORD_FILE
+    networks:
+      - sample-ms
+
+  db-migrate:
+    container_name: db-migrate
+    image: node:lts
+    restart: on-failure
+    working_dir: /srv
+    environment:
+      - NODE_ENV=dev
+      - POSTGRES_PASSWORD_FILE=/run/secrets/POSTGRES_PASSWORD_FILE
+    secrets:
+      - POSTGRES_PASSWORD_FILE
+    env_file:
+      - dev-db.env
+    volumes:
+      - /srv/node_modules
+      - ../sample-db-migrations:/srv
+    networks:
+      - sample-ms
+    deploy:
+      restart_policy:
+        condition: on-failure
+    command: sh -c "export POSTGRES_PASSWORD=$$(cat /run/secrets/POSTGRES_PASSWORD_FILE) && npm install -g npm && npm install --no-package-lock --only=production --legacy-peer-deps --no-fund && node node_modules/db-migrate/bin/db-migrate up"
+
+  ms_sample_auth:
+    image: ghcr.io/lukasa1993/ld_node:latest
+    container_name: ms_sample_auth
+    restart: always
+    secrets:
+      - POSTGRES_PASSWORD_FILE
+    env_file:
+      - ./node.env
+      - ./dev-db.env
+    healthcheck:
+      test: [ "CMD", "wget", "-qO-", "http://localhost:7702/health" ]
+      interval: 1m30s
+      timeout: 10s
+      retries: 3
+    volumes:
+      - /opt/app/node_modules
+      - ../ms-sample-auth:/opt/app
+    working_dir: /opt/app
+    networks:
+      - sample-ms
+
+networks:
+  sample-ms:
+
+secrets:
+  POSTGRES_PASSWORD_FILE:
+    file: ./postgress_password
+  S3_KEY:
+    file: ./s3_key
+  S3_SECRET:
+    file: ./s3_secret

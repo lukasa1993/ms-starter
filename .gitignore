@@ -1,0 +1,8 @@
+.idea
+*.DS_Store*
+postgress_password
+kong.yaml
+s3_key
+s3_secret
+db/data
+**.env**

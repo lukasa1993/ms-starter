@@ -34,7 +34,10 @@ git clone https://github.com/lukasa1993/ms-sample-web-app.git
 
 cd ms-starter
 
-# .env s need to be filled at this point checkout example .envs
+echo ""
+echo ".env s need to be filled at this point checkout example .envs"
+echo "promise they are filled"
+read -r 
 
 docker compose up -d
 

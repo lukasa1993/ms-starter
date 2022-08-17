@@ -62,19 +62,10 @@ services:
       restart_policy:
         condition: on-failure
 
-  kong-admin:
-    container_name: kong-admin
-    image: mtkvnela/kong-admin-ui:latest
-    restart: always
-    ports:
-      - "8800:80"
-    networks:
-      - sample-ms
-
   sample-db:
     container_name: sample-db
     user: postgres
-    image: postgres:alpine
+    image: postgres:12-alpine
     restart: always
     ports:
       - "5432:5432"
@@ -89,7 +80,6 @@ services:
       - dev-db.env
     environment:
       - POSTGRES_PASSWORD_FILE=/run/secrets/POSTGRES_PASSWORD_FILE
-      - POSTGRES_USER=sampledev
     secrets:
       - POSTGRES_PASSWORD_FILE
     networks:
@@ -137,6 +127,63 @@ services:
     working_dir: /opt/app
     networks:
       - sample-ms
+
+  ms_sample_file:
+    image: ghcr.io/lukasa1993/ld_node:latest
+    container_name: ms_sample_file
+    restart: always
+    env_file:
+      - ./node.env
+    healthcheck:
+      test: [ "CMD", "wget", "-qO-", "http://localhost:7702/health" ]
+      interval: 1m30s
+      timeout: 10s
+      retries: 3
+    secrets:
+      - S3_KEY
+      - S3_SECRET
+    volumes:
+      - /opt/app/node_modules
+      - ../ms-sample-file:/opt/app
+    working_dir: /opt/app
+    networks:
+      - sample-ms
+
+  ms_sample_web_app:
+    image: ghcr.io/lukasa1993/ld_node:latest
+    container_name: ms_sample_web_app
+    restart: always
+    env_file:
+      - ./node.env
+    healthcheck:
+      test: [ "CMD", "wget", "-qO-", "http://localhost:7702/health" ]
+      interval: 1m30s
+      timeout: 10s
+      retries: 3
+    volumes:
+      - /opt/app/node_modules
+      - ../ms-sample-web-app:/opt/app
+    working_dir: /opt/app
+    networks:
+      - sample-ms
+
+  s3:
+    container_name: sample-s3
+    image: minio/minio
+    ports:
+      - "9000:9000"
+      - "127.0.0.1:40199:40199"
+    volumes:
+      - ./storage/minio:/data
+    networks:
+      - sample-ms
+    secrets:
+      - S3_KEY
+      - S3_SECRET
+    environment:
+      MINIO_ROOT_USER_FILE: S3_KEY
+      MINIO_ROOT_PASSWORD_FILE: S3_SECRET
+    command: server --address 0.0.0.0:9000 --console-address 0.0.0.0:40199 /data
 
 networks:
   sample-ms:

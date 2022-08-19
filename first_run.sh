@@ -32,7 +32,7 @@ curl -i -X POST \
 curl -i -X POST \
   --url http://localhost:8001/services/ms-sample-user/routes \
   --data 'name=ms-sample-user' \
-  --data 'path=user' \
+  --data 'paths=/user' \
   --data 'hosts[]=api.example.com'
 
 curl -X POST http://localhost:8001/consumers --data "username=anon"
@@ -43,7 +43,8 @@ read -r anon
 
 curl -X POST http://localhost:8001/plugins/ \
   --data "name=oauth2"  \
-  --data "config.scopes=anon,user" \
+  --data "config.scopes=anon" \
+  --data "config.scopes=user" \
   --data "config.mandatory_scope=true" \
   --data "config.global_credentials=true" \
   --data "config.anonymous=$anon" \

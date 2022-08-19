@@ -192,6 +192,11 @@ services:
     container_name: sample_s3
     image: minio/minio
     restart: always
+    healthcheck:
+      test: [ "CMD", "curl", "-I", "http://localhost:9000/minio/health/live" ]
+      interval: 1m30s
+      timeout: 10s
+      retries: 3
     ports:
       - "9000:9000"
       - "127.0.0.1:40199:40199"

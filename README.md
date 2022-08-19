@@ -14,6 +14,8 @@ please change your hosts file
 ```
 192.168.5.1 auth.example.com
 192.168.5.1 app.example.com
+192.168.5.1 admin.example.com
+192.168.5.1 api.example.com
 ```
 
 where `192.168.5.1` is your local lan address
@@ -31,6 +33,7 @@ git clone https://github.com/lukasa1993/sample-db-migrations.git
 git clone https://github.com/lukasa1993/ms-sample-auth.git
 git clone https://github.com/lukasa1993/ms-sample-file.git
 git clone https://github.com/lukasa1993/ms-sample-web-app.git
+git clone https://github.com/lukasa1993/ms-sample-user.git
 
 cd ms-starter
 
@@ -44,4 +47,11 @@ docker compose up -d
 ./first_run.sh
 
 
+```
+
+
+# Adding new MS
+
+```
+git clone https://github.com/lukasa1993/ms-sample-blank.git
 ```

@@ -170,6 +170,27 @@ services:
     networks:
       - sample-ms
 
+  ms_sample_company:
+    image: ghcr.io/lukasa1993/ld_node:latest
+    container_name: ms_sample_company
+    restart: always
+    env_file:
+      - ./node.env
+      - ./dev-db.env
+    healthcheck:
+      test: [ "CMD", "wget", "-qO-", "http://localhost:7702/health" ]
+      interval: 1m30s
+      timeout: 10s
+      retries: 3
+    secrets:
+      - POSTGRES_PASSWORD_FILE
+    volumes:
+      - /opt/app/node_modules
+      - ../ms-sample-company:/opt/app
+    working_dir: /opt/app
+    networks:
+      - sample-ms
+
   ms_sample_web_app:
     image: ghcr.io/lukasa1993/ld_node:latest
     container_name: ms_sample_web_app

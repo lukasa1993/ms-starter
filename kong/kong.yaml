@@ -1,0 +1,153 @@
+_format_version: "1.1"
+consumers:
+- custom_id: 13c2ea9f-8b59-46d3-89ae-31722072241f_2ddf171e-da39-4bcd-a0d6-57c432cffaa2
+  id: 13c2ea9f-8b59-46d3-89ae-31722072241f
+  oauth2_credentials:
+  - client_id: ZDuS8NkRLz48f74uLTDfWakPFPMROqBP
+    client_secret: 3Rx0AD6mJuifJ8C5vVn7bu0BhadIKiBW
+    hash_secret: false
+    name: ms-sample-oauth2
+    redirect_uris:
+    - https://dev.example.com
+  tags:
+  - 2ddf171e-da39-4bcd-a0d6-57c432cffaa2
+- custom_id: 558ed09c-0645-4cf1-adba-1d8aa6fcd646_2ddf171e-da39-4bcd-a0d6-57c432cffaa2
+  id: 558ed09c-0645-4cf1-adba-1d8aa6fcd646
+  oauth2_credentials:
+  - client_id: w244oKzEl70mtzLQ2Pl00NMQuKstGs0h
+    client_secret: OwHNZHsWEjUuXILm411EaIAMcT0KqBLH
+    hash_secret: false
+    name: ms-sample-oauth2
+    redirect_uris:
+    - https://dev.example.com
+  tags:
+  - 2ddf171e-da39-4bcd-a0d6-57c432cffaa2
+- username: anon
+plugins:
+- config:
+    accept_http_if_already_terminated: false
+    anonymous: cb49f1b2-d9ae-403f-9366-a4172ef7b7e2
+    auth_header_name: authorization
+    enable_authorization_code: false
+    enable_client_credentials: true
+    enable_implicit_grant: false
+    enable_password_grant: false
+    global_credentials: true
+    hide_credentials: false
+    mandatory_scope: true
+    pkce: lax
+    provision_key: 5Fn25BEIWZpSVXScCHzNuMUSTys04tVM
+    refresh_token_ttl: 1209600
+    reuse_refresh_token: false
+    scopes:
+    - anon
+    - user
+    - admin
+    token_expiration: 7200
+  enabled: true
+  name: oauth2
+  protocols:
+  - grpc
+  - grpcs
+  - http
+  - https
+services:
+- connect_timeout: 60000
+  enabled: true
+  host: ms_sample_auth
+  name: ms-sample-auth
+  path: /external
+  port: 7702
+  protocol: http
+  read_timeout: 60000
+  retries: 5
+  routes:
+  - hosts:
+    - auth.example.com
+    https_redirect_status_code: 426
+    name: ms-sample-auth
+    path_handling: v0
+    preserve_host: false
+    protocols:
+    - http
+    - https
+    regex_priority: 0
+    request_buffering: true
+    response_buffering: true
+    strip_path: true
+  write_timeout: 60000
+- connect_timeout: 60000
+  enabled: true
+  host: ms_sample_company
+  name: ms-sample-company
+  path: /external
+  port: 7702
+  protocol: http
+  read_timeout: 60000
+  retries: 5
+  routes:
+  - hosts:
+    - api.example.com
+    https_redirect_status_code: 426
+    name: ms-sample-company
+    path_handling: v0
+    paths:
+    - /company
+    preserve_host: false
+    protocols:
+    - http
+    - https
+    regex_priority: 0
+    request_buffering: true
+    response_buffering: true
+    strip_path: true
+  write_timeout: 60000
+- connect_timeout: 60000
+  enabled: true
+  host: ms_sample_user
+  name: ms-sample-user
+  path: /external
+  port: 7702
+  protocol: http
+  read_timeout: 60000
+  retries: 5
+  routes:
+  - hosts:
+    - api.example.com
+    https_redirect_status_code: 426
+    name: ms-sample-user
+    path_handling: v0
+    paths:
+    - /user
+    preserve_host: false
+    protocols:
+    - http
+    - https
+    regex_priority: 0
+    request_buffering: true
+    response_buffering: true
+    strip_path: true
+  write_timeout: 60000
+- connect_timeout: 60000
+  enabled: true
+  host: ms_sample_web_app
+  name: ms-sample-web-app
+  port: 7702
+  protocol: http
+  read_timeout: 60000
+  retries: 5
+  routes:
+  - hosts:
+    - app.example.com
+    https_redirect_status_code: 426
+    name: ms-sample-web-app
+    path_handling: v0
+    preserve_host: false
+    protocols:
+    - http
+    - https
+    regex_priority: 0
+    request_buffering: true
+    response_buffering: true
+    strip_path: true
+  write_timeout: 60000

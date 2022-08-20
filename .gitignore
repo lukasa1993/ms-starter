@@ -1,7 +1,6 @@
 .idea
 *.DS_Store*
 postgress_password
-kong.yaml
 s3_key
 s3_secret
 db/data
@@ -9,3 +8,4 @@ db/data
 storage/minio
 !example.node.dev.env
 !example.dev.db.env
+!konh/kong.yaml

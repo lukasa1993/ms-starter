@@ -18,6 +18,11 @@ curl -i -X POST \
   --data 'name=ms-sample-user' \
   --data 'url=http://ms_sample_user:7702/external'
 
+curl -i -X POST \
+  --url http://localhost:8001/services/ \
+  --data 'name=ms-sample-company' \
+  --data 'url=http://ms_sample_company:7702/external'
+
 
 curl -i -X POST \
   --url http://localhost:8001/services/ms-sample-auth/routes \
@@ -35,6 +40,12 @@ curl -i -X POST \
   --data 'paths=/user' \
   --data 'hosts[]=api.example.com'
 
+curl -i -X POST \
+  --url http://localhost:8001/services/ms-sample-company/routes \
+  --data 'name=ms-sample-company' \
+  --data 'paths=/company' \
+  --data 'hosts[]=api.example.com'
+
 curl -X POST http://localhost:8001/consumers --data "username=anon"
 
 echo ""
@@ -45,6 +56,7 @@ curl -X POST http://localhost:8001/plugins/ \
   --data "name=oauth2"  \
   --data "config.scopes=anon" \
   --data "config.scopes=user" \
+  --data "config.scopes=admin" \
   --data "config.mandatory_scope=true" \
   --data "config.global_credentials=true" \
   --data "config.anonymous=$anon" \

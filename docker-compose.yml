@@ -85,8 +85,8 @@ services:
     networks:
       - sample-ms
 
-  db-migrate:
-    container_name: db_migrate
+  ms_sample_db_migrations:
+    container_name: ms_sample_db_migrations
     image: node:lts
     restart: on-failure
     working_dir: /srv
@@ -99,7 +99,7 @@ services:
       - dev-db.env
     volumes:
       - /srv/node_modules
-      - ../sample-db-migrations:/srv
+      - ../ms-sample-db-migrations:/srv
     networks:
       - sample-ms
     deploy:
@@ -205,6 +205,25 @@ services:
     volumes:
       - /opt/app/node_modules
       - ../ms-sample-web-app:/opt/app
+    working_dir: /opt/app
+    networks:
+      - sample-ms
+
+
+  ms_sample_admin_web_app:
+    image: ghcr.io/lukasa1993/ld_node:latest
+    container_name: ms_sample_admin_web_app
+    restart: always
+    env_file:
+      - ./node.env
+    healthcheck:
+      test: [ "CMD", "wget", "-qO-", "http://localhost:7702/health" ]
+      interval: 1m30s
+      timeout: 10s
+      retries: 3
+    volumes:
+      - /opt/app/node_modules
+      - ../ms-sample-admin-web-app:/opt/app
     working_dir: /opt/app
     networks:
       - sample-ms

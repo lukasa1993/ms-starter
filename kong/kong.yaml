@@ -1,7 +1,7 @@
 _format_version: "1.1"
 consumers:
-- id: cb49f1b2-d9ae-403f-9366-a4172ef7b7e2
-  username: anon
+- username: anon
+  id: cb49f1b2-d9ae-403f-9366-a4172ef7b7e2
 plugins:
 - config:
     accept_http_if_already_terminated: false
@@ -31,6 +31,29 @@ plugins:
   - http
   - https
 services:
+- connect_timeout: 60000
+  enabled: true
+  host: ms_sample_admin_web_app
+  name: ms-sample-admin-web-app
+  port: 7702
+  protocol: http
+  read_timeout: 60000
+  retries: 5
+  routes:
+  - hosts:
+    - admin.example.com
+    https_redirect_status_code: 426
+    name: ms-sample-admin-web-app
+    path_handling: v0
+    preserve_host: false
+    protocols:
+    - http
+    - https
+    regex_priority: 0
+    request_buffering: true
+    response_buffering: true
+    strip_path: true
+  write_timeout: 60000
 - connect_timeout: 60000
   enabled: true
   host: ms_sample_auth

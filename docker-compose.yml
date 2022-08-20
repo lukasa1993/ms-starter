@@ -62,29 +62,6 @@ services:
       restart_policy:
         condition: on-failure
 
-  sample_db:
-    container_name: sample_db
-    user: postgres
-    image: postgres:12-alpine
-    restart: always
-    ports:
-      - "5432:5432"
-    healthcheck:
-      test: [ "CMD", "pg_isready" ]
-      timeout: 20s
-      retries: 10
-    volumes:
-      - ./db:/docker-entrypoint-initdb.d
-      - ./db/data:/var/lib/postgresql/data
-    env_file:
-      - dev-db.env
-    environment:
-      - POSTGRES_PASSWORD_FILE=/run/secrets/POSTGRES_PASSWORD_FILE
-    secrets:
-      - POSTGRES_PASSWORD_FILE
-    networks:
-      - sample-ms
-
   ms_sample_db_migrations:
     container_name: ms_sample_db_migrations
     image: node:lts
@@ -111,11 +88,8 @@ services:
     image: ghcr.io/lukasa1993/ld_node:latest
     container_name: ms_sample_auth
     restart: always
-    secrets:
-      - POSTGRES_PASSWORD_FILE
     env_file:
       - ./node.env
-      - ./dev-db.env
     healthcheck:
       test: [ "CMD", "wget", "-qO-", "http://localhost:7702/health" ]
       interval: 1m30s
@@ -227,6 +201,31 @@ services:
     working_dir: /opt/app
     networks:
       - sample-ms
+
+
+  sample_db:
+    container_name: sample_db
+    user: postgres
+    image: postgres:12-alpine
+    restart: always
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: [ "CMD", "pg_isready" ]
+      timeout: 20s
+      retries: 10
+    volumes:
+      - ./db:/docker-entrypoint-initdb.d
+      - ./db/data:/var/lib/postgresql/data
+    env_file:
+      - dev-db.env
+    environment:
+      - POSTGRES_PASSWORD_FILE=/run/secrets/POSTGRES_PASSWORD_FILE
+    secrets:
+      - POSTGRES_PASSWORD_FILE
+    networks:
+      - sample-ms
+
 
   sample_s3:
     container_name: sample_s3

@@ -32,7 +32,7 @@ mkdir microservices-starter
 cd microservices-starter
 
 git clone https://github.com/lukasa1993/ms-starter.git
-git clone https://github.com/lukasa1993/sample-db-migrations.git
+git clone https://github.com/lukasa1993/ms-sample-db-migrations.git
 git clone https://github.com/lukasa1993/ms-sample-auth.git
 git clone https://github.com/lukasa1993/ms-sample-file.git
 git clone https://github.com/lukasa1993/ms-sample-web-app.git

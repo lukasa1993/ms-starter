@@ -6,8 +6,9 @@
 2. [auth](https://github.com/lukasa1993/ms-sample-auth)
 3. [files](https://github.com/lukasa1993/ms-sample-file)
 4. [web-app](https://github.com/lukasa1993/ms-sample-web-app)
-5. [user](https://github.com/lukasa1993/ms-sample-user)
-6. [company](https://github.com/lukasa1993/ms-sample-company)
+5. [admin-web-app](https://github.com/lukasa1993/ms-sample-admin-web-app)
+6. [user](https://github.com/lukasa1993/ms-sample-user)
+7. [company](https://github.com/lukasa1993/ms-sample-company)
 
 
 if you want to use this out of box without your custom domain
@@ -35,6 +36,7 @@ git clone https://github.com/lukasa1993/sample-db-migrations.git
 git clone https://github.com/lukasa1993/ms-sample-auth.git
 git clone https://github.com/lukasa1993/ms-sample-file.git
 git clone https://github.com/lukasa1993/ms-sample-web-app.git
+git clone https://github.com/lukasa1993/ms-sample-admin-web-app.git
 git clone https://github.com/lukasa1993/ms-sample-user.git
 git clone https://github.com/lukasa1993/ms-sample-company.git
 

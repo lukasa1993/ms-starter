@@ -1,28 +1,7 @@
 _format_version: "1.1"
 consumers:
-- custom_id: 13c2ea9f-8b59-46d3-89ae-31722072241f_2ddf171e-da39-4bcd-a0d6-57c432cffaa2
-  id: 13c2ea9f-8b59-46d3-89ae-31722072241f
-  oauth2_credentials:
-  - client_id: ZDuS8NkRLz48f74uLTDfWakPFPMROqBP
-    client_secret: 3Rx0AD6mJuifJ8C5vVn7bu0BhadIKiBW
-    hash_secret: false
-    name: ms-sample-oauth2
-    redirect_uris:
-    - https://dev.example.com
-  tags:
-  - 2ddf171e-da39-4bcd-a0d6-57c432cffaa2
-- custom_id: 558ed09c-0645-4cf1-adba-1d8aa6fcd646_2ddf171e-da39-4bcd-a0d6-57c432cffaa2
-  id: 558ed09c-0645-4cf1-adba-1d8aa6fcd646
-  oauth2_credentials:
-  - client_id: w244oKzEl70mtzLQ2Pl00NMQuKstGs0h
-    client_secret: OwHNZHsWEjUuXILm411EaIAMcT0KqBLH
-    hash_secret: false
-    name: ms-sample-oauth2
-    redirect_uris:
-    - https://dev.example.com
-  tags:
-  - 2ddf171e-da39-4bcd-a0d6-57c432cffaa2
-- username: anon
+- id: cb49f1b2-d9ae-403f-9366-a4172ef7b7e2
+  username: anon
 plugins:
 - config:
     accept_http_if_already_terminated: false

@@ -47,8 +47,7 @@ read -r
 
 docker compose up -d
 
-./first_run.sh
-
+docker run -it --rm --network=host --platform=linux/amd64 -v $PWD/kong:/data -w /data kong/deck sync
 
 ```
 

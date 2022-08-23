@@ -66,6 +66,9 @@ git clone https://github.com/lukasa1993/ms-sample-blank.git
 
 ### First run
 ```
+mkdir -P ./db_prod_test/data
+mkdir -P ./storage_prod_test/minio
+
 docker swarm init
 
 docker stack deploy -c docker-compose-prod-test.yml --prune --with-registry-auth test
@@ -73,9 +76,6 @@ docker stack deploy -c docker-compose-prod-test.yml --prune --with-registry-auth
 
 ### Single image update
 ```
-
-mkdir -P ./db_prod_test/data
-mkdir -P ./storage_prod_test/minio
 
 docker pull ghcr.io/lukasa1993/ms-sample-auth:latest
 

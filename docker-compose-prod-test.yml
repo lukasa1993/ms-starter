@@ -25,7 +25,7 @@ services:
     working_dir: /tmp/run
     healthcheck:
       test: [ "CMD", "wget", "-qO-", "http://localhost:8001/status" ]
-      start_period: 10s
+      start_period: 15s
       interval: 1m30s
       timeout: 10s
       retries: 3
@@ -100,7 +100,7 @@ services:
       - node.env
     healthcheck:
       test: [ "CMD", "wget", "-qO-", "http://localhost:7702/health" ]
-      start_period: 10s
+      start_period: 15s
       interval: 1m30s
       timeout: 10s
       retries: 3
@@ -118,7 +118,7 @@ services:
       - ./node.env
     healthcheck:
       test: [ "CMD", "wget", "-qO-", "http://localhost:7702/health" ]
-      start_period: 10s
+      start_period: 15s
       interval: 1m30s
       timeout: 10s
       retries: 3
@@ -138,7 +138,7 @@ services:
     image: ghcr.io/lukasa1993/ms-sample-user:latest
     healthcheck:
       test: [ "CMD", "wget", "-qO-", "http://localhost:7702/health" ]
-      start_period: 10s
+      start_period: 15s
       interval: 1m30s
       timeout: 10s
       retries: 3
@@ -160,7 +160,7 @@ services:
     image: ghcr.io/lukasa1993/ms-sample-company:latest
     healthcheck:
       test: [ "CMD", "wget", "-qO-", "http://localhost:7702/health" ]
-      start_period: 10s
+      start_period: 15s
       interval: 1m30s
       timeout: 10s
       retries: 3
@@ -183,7 +183,7 @@ services:
       - ./node.env
     healthcheck:
       test: [ "CMD", "wget", "-qO-", "http://localhost:7702/health" ]
-      start_period: 10s
+      start_period: 15s
       interval: 1m30s
       timeout: 10s
       retries: 3
@@ -202,7 +202,7 @@ services:
       - ./node.env
     healthcheck:
       test: [ "CMD", "wget", "-qO-", "http://localhost:7702/health" ]
-      start_period: 10s
+      start_period: 15s
       interval: 1m30s
       timeout: 10s
       retries: 3
@@ -227,8 +227,8 @@ services:
       timeout: 20s
       retries: 10
     volumes:
-      - ./db_prod_test:/docker-entrypoint-initdb.d
-      - ./db_prod_test/data:/var/lib/postgresql/data
+      - ./db:/docker-entrypoint-initdb.d
+      - ./db/data:/var/lib/postgresql/data
     env_file:
       - dev-db.env
     environment:
@@ -243,7 +243,7 @@ services:
     image: minio/minio
     healthcheck:
       test: [ "CMD", "curl", "-I", "http://localhost:9000/minio/health/live" ]
-      start_period: 10s
+      start_period: 15s
       interval: 1m30s
       timeout: 10s
       retries: 3
@@ -251,7 +251,7 @@ services:
       - "9000:9000"
       - "40199:40199"
     volumes:
-      - ./storage_prod_test/minio:/data
+      - ./storage/minio:/data
     networks:
       - sample-ms
     secrets:

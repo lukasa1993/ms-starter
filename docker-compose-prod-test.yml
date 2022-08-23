@@ -17,7 +17,7 @@ services:
     secrets:
       - POSTGRES_PASSWORD_FILE
     env_file:
-      - db.env
+      - dev-db.env
     ports:
       - "80:8000"
       - "443:8443"
@@ -49,7 +49,7 @@ services:
     secrets:
       - POSTGRES_PASSWORD_FILE
     env_file:
-      - db.env
+      - dev-db.env
     networks:
       - sample-ms
     deploy:
@@ -66,7 +66,7 @@ services:
     secrets:
       - POSTGRES_PASSWORD_FILE
     env_file:
-      - db.env
+      - dev-db.env
     networks:
       - sample-ms
     deploy:
@@ -84,7 +84,7 @@ services:
     secrets:
       - POSTGRES_PASSWORD_FILE
     env_file:
-      - db.env
+      - dev-db.env
     networks:
       - sample-ms
     deploy:
@@ -146,7 +146,7 @@ services:
       - POSTGRES_PASSWORD_FILE
     env_file:
       - node.env
-      - db.env
+      - dev-db.env
     deploy:
       update_config:
         order: start-first
@@ -168,7 +168,7 @@ services:
       - POSTGRES_PASSWORD_FILE
     env_file:
       - node.env
-      - db.env
+      - dev-db.env
     deploy:
       update_config:
         order: start-first
@@ -214,13 +214,61 @@ services:
     networks:
       - sample-ms
 
+
+
+  sample_db:
+    user: postgres
+    image: postgres:12-alpine
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: [ "CMD", "pg_isready" ]
+      start_period: 5s
+      timeout: 20s
+      retries: 10
+    volumes:
+      - ./db_prod_test:/docker-entrypoint-initdb.d
+      - ./db_prod_test/data:/var/lib/postgresql/data
+    env_file:
+      - dev-db.env
+    environment:
+      - POSTGRES_PASSWORD_FILE=/run/secrets/POSTGRES_PASSWORD_FILE
+    secrets:
+      - POSTGRES_PASSWORD_FILE
+    networks:
+      - sample-ms
+
+
+  sample_s3:
+    image: minio/minio
+    healthcheck:
+      test: [ "CMD", "curl", "-I", "http://localhost:9000/minio/health/live" ]
+      start_period: 10s
+      interval: 1m30s
+      timeout: 10s
+      retries: 3
+    ports:
+      - "9000:9000"
+      - "40199:40199"
+    volumes:
+      - ./storage_prod_test/minio:/data
+    networks:
+      - sample-ms
+    secrets:
+      - S3_KEY
+      - S3_SECRET
+    environment:
+      MINIO_ROOT_USER_FILE: S3_KEY
+      MINIO_ROOT_PASSWORD_FILE: S3_SECRET
+    command: server --address 0.0.0.0:9000 --console-address 0.0.0.0:40199 /data
+
 networks:
   sample-ms:
 
 secrets:
   POSTGRES_PASSWORD_FILE:
-    external: true
+    file: ./postgress_password
   S3_KEY:
-    external: true
+    file: ./s3_key
   S3_SECRET:
-    external: true
+    file: ./s3_secret

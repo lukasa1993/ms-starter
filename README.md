@@ -59,3 +59,28 @@ docker run -it --rm --network=host --platform=linux/amd64 -v $PWD/kong:/data -w 
 ```
 git clone https://github.com/lukasa1993/ms-sample-blank.git
 ```
+
+# Testing production run on local
+## in real production s3 and db must be services not in our stack
+
+
+### First run
+```
+docker swarm init
+
+docker stack deploy -c docker-compose-prod-test.yml --prune --with-registry-auth test
+```
+
+### Single image update
+```
+
+mkdir -P ./db_prod_test/data
+mkdir -P ./storage_prod_test/minio
+
+docker pull ghcr.io/lukasa1993/ms-sample-auth:latest
+
+docker service update --update-order start-first test_ms_sample_auth --image=ghcr.io/lukasa1993/ms-sample-auth:latest --with-registry-auth --detach
+
+```
+
+

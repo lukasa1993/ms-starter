@@ -3,9 +3,9 @@
 postgress_password
 s3_key
 s3_secret
-db/data
+db**/data
 **.env**
-storage/minio
+storage**/minio
 !example.node.dev.env
 !example.dev.db.env
 !konh/kong.yaml

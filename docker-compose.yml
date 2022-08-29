@@ -62,28 +62,6 @@ services:
       restart_policy:
         condition: on-failure
 
-  ms_sample_db_migrations:
-    container_name: ms_sample_db_migrations
-    image: node:lts
-    restart: on-failure
-    working_dir: /srv
-    environment:
-      - NODE_ENV=dev
-      - POSTGRES_PASSWORD_FILE=/run/secrets/POSTGRES_PASSWORD_FILE
-    secrets:
-      - POSTGRES_PASSWORD_FILE
-    env_file:
-      - dev-db.env
-    volumes:
-      - /srv/node_modules
-      - ../ms-sample-db-migrations:/srv
-    networks:
-      - sample-ms
-    deploy:
-      restart_policy:
-        condition: on-failure
-    command: sh -c "export POSTGRES_PASSWORD=$$(cat /run/secrets/POSTGRES_PASSWORD_FILE) && npm install -g npm && npm install --no-package-lock --only=production --legacy-peer-deps --no-fund && node node_modules/db-migrate/bin/db-migrate up"
-
   ms_sample_auth:
     image: ghcr.io/lukasa1993/ld_node:latest
     container_name: ms_sample_auth

@@ -143,6 +143,27 @@ services:
     networks:
       - sample-ms
 
+  ms_sample_email:
+    image: ghcr.io/lukasa1993/ld_node:latest
+    container_name: ms_sample_email
+    restart: always
+    env_file:
+      - ./node.env
+      - ./dev-db.env
+    healthcheck:
+      test: [ "CMD", "wget", "-qO-", "http://localhost:7702/health" ]
+      interval: 1m30s
+      timeout: 10s
+      retries: 3
+    secrets:
+      - SENDGRID_KEY
+    volumes:
+      - /opt/app/node_modules
+      - ../ms-sample-email:/opt/app
+    working_dir: /opt/app
+    networks:
+      - sample-ms
+
   ms_sample_web_app:
     image: ghcr.io/lukasa1993/ld_node:latest
     container_name: ms_sample_web_app
@@ -239,3 +260,5 @@ secrets:
     file: ./s3_key
   S3_SECRET:
     file: ./s3_secret
+  SENDGRID_KEY:
+    file: ./sendgrid_key

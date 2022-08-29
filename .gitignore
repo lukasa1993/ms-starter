@@ -9,3 +9,4 @@ storage**/minio
 !example.node.dev.env
 !example.dev.db.env
 !konh/kong.yaml
+sendgrid_key

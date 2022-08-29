@@ -158,6 +158,27 @@ services:
     networks:
       - sample-ms
 
+
+  ms_sample_email:
+    image: ghcr.io/lukasa1993/ms-sample-email:latest
+    healthcheck:
+      test: [ "CMD", "wget", "-qO-", "http://localhost:7702/health" ]
+      start_period: 15s
+      interval: 1m30s
+      timeout: 10s
+      retries: 3
+    secrets:
+      - SENDGRID_KEY
+    env_file:
+      - node.env
+    deploy:
+      update_config:
+        order: start-first
+      restart_policy:
+        condition: any
+    networks:
+      - sample-ms
+
   ms_sample_web_app:
     image: ghcr.io/lukasa1993/ms-sample-web-app:latest
     env_file:
@@ -252,4 +273,6 @@ secrets:
   S3_KEY:
     file: ./s3_key
   S3_SECRET:
+    file: ./s3_secret
+  SENDGRID_KEY:
     file: ./s3_secret

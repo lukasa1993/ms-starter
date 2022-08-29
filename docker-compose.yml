@@ -248,6 +248,7 @@ services:
     environment:
       MINIO_ROOT_USER_FILE: S3_KEY
       MINIO_ROOT_PASSWORD_FILE: S3_SECRET
+      MINIO_SITE_REGION: geo
     command: server --address 0.0.0.0:9000 --console-address 0.0.0.0:40199 /data
 
 networks:
